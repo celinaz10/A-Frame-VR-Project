@@ -1,0 +1,700 @@
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
+	<script src="https://unpkg.com/aframe-physics-extras@0.1.2/dist/aframe-physics-extras.min.js"></script>
+    <script src="script.js"></script>
+    <script src="kinema.js"></script>
+    <script src="player.js"></script>
+    <script src="portal.js"></script>
+    <script src="goal.js"></script>
+    <script src="spinner.js"></script>
+    <script src="shover.js"></script>
+	<style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    h1 {
+      position: absolute;
+      top: 20px; /* Adjust position */
+      left: 20px; /* Adjust position */
+      z-index: 10;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    a-scene {
+      z-index: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  </head>
+  <body>
+  
+    <a-scene style="z-index:0" physics="debug: false; gravity: -30; restitution: 0.05" fog="type: exponential; density: 0.0025; near: 1; color:#FFF;" renderer="logarithmicDepthBuffer: true; colorManagement:true; multiviewStereo: true">
+		<a-assets>
+		</a-assets>
+	  <h1 style="color:black" id="health">Health: 100</h1>
+
+      <!-- <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#7BC8A4"></a-plane> -->
+	  <a-box static-body position="0 -0.5 0" width="20" depth="20" color="grey"></a-box>
+	  <a-box static-body position="-2 5 0" width="0.5" depth="20" height="10" color="grey" opacity="0.05" alphaTest="0.1"></a-box>
+	  <a-box static-body position="0 -0.4 0" width="2" depth="2" color="yellow"></a-box>
+	  
+	  
+	  <a-box static-body position="5 0.5 -7" width="10" height="0.3" depth="2" class="spinner" physics-collider="collisionForces: true; ignoreSleep: true"></a-box>
+	  <a-box static-body position="5 0.5 -7" width="10" height="0.3" depth="2" class="spinner" physics-collider="collisionForces: true; ignoreSleep: true"></a-box>
+	  <a-box static-body position="-6 2.25 -4.5" width="0.2" height="2" depth="2" id="shover"></a-box>
+	  <a-box static-body position="-6 0.5 4.5" width="2" height="0.2" depth="2" rotation="0 90 0"id="moving_plat"></a-box>
+	  
+	  
+	  <a-box dynamic-body="mass: 15" position="-4.5 2 -4.5" scale="0.7 0.7 0.7" color="beige"></a-box>
+	  <a-box dynamic-body="mass: 2" position="0 3 -3" scale="0.7 0.7 0.7" color="beige" ></a-box>
+	  
+	  
+	  <a-box static-body position="-5 0.2 -1.5" width="2" depth="2"></a-box>
+	  <a-box static-body position="-5 1 -4.5" width="2" depth="2" height="0.5"></a-box>
+	  <a-box static-body position="-5 1.8 -7.5" width="2" depth="2" height="0.5"></a-box>
+	  
+	  
+	  <a-box static-body position="-5 2.1 -7.5" width="1" depth="1" height="0.2" color="lime" id="score1"></a-box>
+	  <a-box static-body position="5 1 0" rotation="0 90 0" opacity="0.4" width="2" depth="0.2" height="2" color="red" id="portal" alpha="0.8"></a-box>
+
+	  <a-box static-body position="-5 0.82 -1.5" width="2" height="0.25" depth="0.5" class="killBrick" material="color: red"></a-box>
+	  <a-box static-body position="0 0 -2" width="2" height="0.25" depth="0.5" class="killBrick" material="color: red"></a-box>
+	  
+	  
+	  
+	  
+	  <a-text value="Reference: initial camera direction" position="-1 2 -2" color="black" rotation="0, 90, 0" scale=""></a-text>
+
+	  
+
+		<a-camera position="0 1.2 0" look-controls="pointerLockEnabled:true" id="spawn">
+			<a-cursor>
+				<!-- <a-text value="Health: 100" font="aileronsemibold" position="-1.15 0.5 0.3" id="health" scale="0.3 0.3 0.3" material="depthTest: false;" color="grey" transparent="true" alphaTest="0.5"></a-text> -->
+			</a-cursor>      
+		</a-camera>	  
+
+	  
+	 <!-- <a-camera position="-3 1.2 0" id="tower1cam" active="false">
+		<a-cursor></a-cursor>      
+	  </a-camera> -->
+	  
+	  
+	  <a-entity position="0 1 0">
+		<a-camera position="0 2 5" id="birdview" active="false">
+			<a-cursor>
+			</a-cursor>      
+		</a-camera>
+	  </a-entity>
+	  
+	  <a-entity position="0, -30, 0">
+		<a-box static-body color="#818596" scale="784, 75, 525" position="-151.5, -68, 1" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#818596" scale="150, 58, 87" position="87.057, -59.5, 162.517" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#818596" scale="107, 181, 78" position="105.908, -121, -175.164" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#999db1" scale="236, 311, 212" position="-343.732, 173, 303.408" rotation="0, 150, 0"></a-box>
+			<a-box static-body color="#999db1" scale="486, 318, 153" position="-218.732, 169.5, 332.908" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#999db1" scale="237, 300, 153" position="39.993, 178.5, 283.583" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#999db1" scale="298, 321, 153" position="226.9, 168, 233.501" rotation="0, -165, 0"></a-box>
+			<a-box static-body color="#999db1" scale="162, 323, 170" position="401.673, 187, 153.097" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#999db1" scale="162, 311, 170" position="401.673, 193, 30.819" rotation="0, -165, 0"></a-box>
+			<a-box static-body color="#999db1" scale="162, 348, 170" position="345.266, 174.5, -105.362" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#999db1" scale="162, 337, 170" position="269.846, 180, -163.233" rotation="0, -105, 0"></a-box>
+			<a-box static-body color="#999db1" scale="162, 315, 170" position="194.426, 191, -221.105" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#999db1" scale="268, 316, 167" position="58.606, 170.5, -317.769" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#999db1" scale="157, 303, 153" position="-74.001, 177, -335.783" rotation="0, 0, 0"></a-box>
+			<a-box static-body color="#999db1" scale="125, 303, 153" position="-272.001, 177, -335.783" rotation="0, 0, 0"></a-box>
+			<a-box static-body color="#999db1" scale="231, 316, 153" position="-352.825, 170.5, -284.958" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#999db1" scale="170, 612, 151" position="-473.727, 275.5, -208.458" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#999db1" scale="144, 359, 229" position="-455.53, 149, 229.047" rotation="0, 120, 0"></a-box>
+			<a-box static-body color="#999db1" scale="281, 660, 188" position="-527.002, 299.5, 231.119" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#999db1" scale="486, 111, 153" position="-91.501, 273, -335.783" rotation="0, 0, 0"></a-box>
+			<a-box static-body color="#999db1" scale="43, 91, 153" position="-139.776, 212.926, -335.783" rotation="0, 0, 30"></a-box>
+			<a-box static-body color="#999db1" scale="43, 91, 153" position="-212.608, 227.775, -335.783" rotation="0, 0, 135"></a-box>
+			<a-box static-body color="#999db1" scale="486, 105, 153" position="-218.732, 276, 332.908" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#818596" scale="236, 48, 212" position="-343.732, -6.5, 303.408" rotation="0, 150, 0"></a-box>
+			<a-box static-body color="#818596" scale="486, 39, 153" position="-218.732, -11, 332.908" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#818596" scale="237, 59, 153" position="39.993, -1, 283.583" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#818596" scale="298, 108, 153" position="226.9, -46.5, 233.501" rotation="0, -165, 0"></a-box>
+			<a-box static-body color="#818596" scale="162, 142, 170" position="401.673, -45.5, 153.097" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#818596" scale="162, 147, 170" position="401.673, -36, 30.819" rotation="0, -165, 0"></a-box>
+			<a-box static-body color="#818596" scale="162, 144, 170" position="345.266, -71.5, -105.362" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#818596" scale="162, 171, 170" position="269.846, -74, -163.233" rotation="0, -105, 0"></a-box>
+			<a-box static-body color="#818596" scale="162, 1072, 170" position="194.426, -502.5, -221.105" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#818596" scale="486, 56, 153" position="-91.501, -2.5, -335.783" rotation="0, 0, 0"></a-box>
+			<a-box static-body color="#818596" scale="268, 43, 167" position="58.606, -9, -317.769" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#818596" scale="237, 43, 153" position="-350.227, -9, -286.458" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#a3a7bd" scale="111, 380, 220" position="318.217, 333.553, 122.755" rotation="-1.919, 157.56, -28.897"></a-box>
+			<a-box static-body color="#a3a7bd" scale="111, 315, 225" position="332.918, 365.095, 24.743" rotation="0, -150, -30"></a-box>
+			<a-box static-body color="#a3a7bd" scale="111, 279, 225" position="192.13, 414.009, -85.15" rotation="0, -135, -45"></a-box>
+			<a-box static-body color="#a3a7bd" scale="144, 534, 246" position="-421.374, 397.663, 194.891" rotation="30, 135, 0"></a-box>
+			<a-box static-body color="#a3a7bd" scale="262, 367, 212" position="-295.35, 486, 221.607" rotation="30, 150, 0"></a-box>
+			<a-box static-body color="#a3a7bd" scale="262, 367, 108" position="-121.732, 422.104, 238.202" rotation="30, 180, 0"></a-box>
+			<a-box static-body color="#a3a7bd" scale="166, 267, 219" position="65.024, 422.595, 256.748" rotation="25.659, -146.31, 1.102"></a-box>
+			<a-box static-body color="#a3a7bd" scale="233, 347, 172" position="183.89, 368.834, 215.575" rotation="14.478, 179.496, -3.967"></a-box>
+			<a-box static-body color="#aaaec5" scale="111, 668, 905" position="166, 513, 100.5" rotation="0, -180, -90"></a-box>
+			<a-box static-body color="#aaaec5" scale="85, 682, 594" position="-276.347, 586, 24.667" rotation="0, 150, -90"></a-box>
+			<a-box static-body color="#a3a7bd" scale="165, 347, 140" position="-474.009, 498.963, 129.942" rotation="30, 165, 0"></a-box>
+			<a-box static-body color="#999db1" scale="165, 284, 115" position="-536.911, 477.933, 140.6" rotation="30, 165, 0"></a-box>
+			<a-box static-body color="#a3a7bd" scale="278, 493, 162" position="-357.483, 387.178, -239.119" rotation="30, 30, 0"></a-box>
+			<a-box static-body color="#aaaec5" scale="72, 145, 393" position="-185.99, 550.201, -22.5" rotation="0, 180, -45"></a-box>
+			<a-box static-body color="#a3a7bd" scale="417, 144, 225" position="-130.001, 468.177, -208.652" rotation="0, -90, -135"></a-box>
+			<a-box static-body color="#a3a7bd" scale="261, 85, 225" position="58.826, 388.749, -205.15" rotation="0, -120, -120"></a-box>
+			<a-box static-body color="#999db1" scale="11, 102, 88" position="-389.986, 580.308, -51.541" rotation="30, -15, 0"></a-box>
+			<a-box static-body color="#999db1" scale="22, 157, 88" position="-402.365, 556.492, -69.093" rotation="30, -15, 0"></a-box>
+			<a-box static-body color="#999db1" scale="39, 246, 88" position="-426.067, 517.954, -98.479" rotation="30, -15, 0"></a-box>
+			<a-box static-body color="#999db1" scale="111, 261, 88" position="-497.541, 511.459, -121.513" rotation="30, -15, 0"></a-box>
+			<a-box static-body color="#818596" scale="171, 371, 71" position="111.114, -236, -117.595" rotation="0, -120, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="162, 894, 170" position="269.846, -606.5, -163.233" rotation="0, -105, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="162, 1174, 170" position="345.266, -730.5, -105.362" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="162, 919, 170" position="401.673, -569, 30.819" rotation="0, -165, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="162, 747, 170" position="401.673, -490, 153.097" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="298, 1221, 153" position="226.9, -711, 233.501" rotation="0, -165, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="97, 265, 63" position="102.589, -256.514, -113.105" rotation="-15, -120, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="48, 288, 51" position="113.041, -255.5, -49.913" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="81, 331, 50" position="104.741, -261, -10.876" rotation="0, -105, 0"></a-box>
+			<a-box static-body color="#818596" scale="84, 227, 51" position="76.098, -166.647, -43" rotation="-15, -90, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="74, 271, 74" position="136.722, -276.628, 171.121" rotation="-15, -60, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="63, 297, 61" position="145.246, -273, 112.506" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="51, 283, 50" position="115.126, -285, 0.835" rotation="0, -75, 0"></a-box>
+			<a-box static-body color="#5d606c" scale="51, 283, 50" position="120.874, -285, 44.496" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#818596" scale="103, 297, 67" position="107.362, -228, 62.883" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#818596" scale="48, 382, 48" position="94.616, -233.5, 121.258" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#818596" scale="48, 360, 48" position="132.795, -222.5, 137.072" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#818596" scale="48, 354, 48" position="148.609, -219.5, 157.681" rotation="0, -75, 0"></a-box>
+			<a-box static-body color="#818596" scale="147, 113, 134" position="-341.052, -26, 16.219" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#818596" scale="67, 31, 107" position="-300.792, -15, 37.305" rotation="0, 135, 0"></a-box>
+			<a-box static-body color="#818596" scale="77, 49, 81" position="-295.05, -6, 73.25" rotation="0, 120, 0"></a-box>
+			<a-box static-body color="#818596" scale="77, 49, 81" position="-289.811, -6, 113.048" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#818596" scale="77, 49, 81" position="-314.247, -6, 144.894" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#999db1" scale="210, 169, 114" position="-363.809, 2, 49.234" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#818596" scale="121, 83, 87" position="-333.506, -9, -208.55" rotation="0, 150, 0"></a-box>
+			<a-box static-body color="#818596" scale="121, 83, 87" position="-302.862, -9, -155.472" rotation="0, 90, 0"></a-box>
+			<a-box static-body color="#818596" scale="121, 83, 87" position="-333.506, -9, -102.394" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#999db1" scale="112, 88, 117" position="-349.29, 13.5, -48.21" rotation="0, 90, 0"></a-box>
+			<a-box static-body color="#afb4cb" scale="94, 126, 92" position="-350.753, 25.166, -179.177" rotation="-15, 135, 0"></a-box>
+			<a-box static-body color="#afb4cb" scale="110, 201, 126" position="-382.011, 50, -136.605" rotation="0, 135, 0"></a-box>
+			<a-box static-body color="#afb4cb" scale="193, 197, 292" position="-480.188, 16, -87.297" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#afb4cb" scale="192, 209, 278" position="-518.188, 22, 66.203" rotation="0, 90, 0"></a-box>
+			<a-box static-body color="#999db1" scale="112, 88, 117" position="-384.337, 13.5, 147.555" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#818596" scale="77, 49, 81" position="-354.045, -6, 150.134" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#4b6345" scale="106, 91, 114" position="-350.79, 15, -48.21" rotation="0, 90, 0"></a-box>
+			<a-box static-body color="#526d4d" scale="208, 172, 112" position="-365.034, 3.5, 48.527" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#688a61" scale="190, 200, 288" position="-481.731, 17.5, -89.264" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#688a61" scale="188, 212, 259" position="-513.688, 23.5, 68.203" rotation="0, 90, 0"></a-box>
+			<a-box static-body color="#b6bbd3" scale="35, 197, 20" position="-248.605, 43.01, -265.636" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="54, 118, 32" position="-243.855, 3.51, -257.409" rotation="0, -60, 15"></a-box>
+			<a-box static-body color="#878b9c" scale="46, 118, 32" position="-220.279, -27.5, -255.756" rotation="0, -105, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="40, 15, 23" position="-227.158, -23, -227.597" rotation="0, -75, 0"></a-box>
+			<a-box static-body color="#85899a" scale="42, 22, 23" position="-211.158, -19.5, -199.597" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="55, 15, 18" position="-199.827, -23, -166.781" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#747786" scale="28, 23, 20" position="-198.139, -19, -149.858" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#85899a" scale="31, 11, 34" position="-208.623, -29.031, -155.929" rotation="30, -60, 0"></a-box>
+			<a-box static-body color="#85899a" scale="25, 18, 26" position="-183.139, -21.5, -137.358" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="18, 21, 37" position="-161.964, -20, -119.464" rotation="0, -120, 0"></a-box>
+			<a-box static-body color="#85899a" scale="30, 17, 25" position="-163.464, -22, -116.866" rotation="0, -120, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="12, 18, 29" position="-135.5, -21.5, -111" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#85899a" scale="18, 14, 24" position="-115.888, -23.5, -108.851" rotation="0, -105, 0"></a-box>
+			<a-box static-body color="#747786" scale="13, 11, 36" position="-93.888, -25, -106.351" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#747786" scale="13, 9, 18" position="-74.796, -26, -112.715" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="10, 11, 44" position="-52.163, -25, -127.514" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#85899a" scale="13, 7, 44" position="-48.913, -27, -121.885" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#85899a" scale="20, 17, 19" position="-29.5, -22, -143" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#747786" scale="20, 15, 19" position="-29.5, -23, -143" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="18, 14, 16" position="-17.779, -23.5, -145.623" rotation="0, -165, 0"></a-box>
+			<a-box static-body color="#747786" scale="13, 11, 22" position="-2, -25, -147.5" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#85899a" scale="13, 9, 32" position="17.866, -26, -155" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="13, 7, 30" position="41.297, -27, -167.954" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="21, 6, 21" position="56.5, -27.5, -177.5" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#85899a" scale="11, 9, 44" position="76.697, -26, -189.969" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#85899a" scale="18, 14, 24" position="94, -23.5, -204" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="57, 104, 9" position="-181.001, 159.556, -317.84" rotation="90, 180, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="57, 22, 9" position="-181.001, 153.096, -261.244" rotation="45, 180, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="57, 172, 9" position="-181.001, 62.5, -254.783" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="230, 10, 116" position="-143.577, -25.5, -311.711" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="45, 7, 54" position="-187.477, -27, -207.775" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="45, 7, 54" position="-176.991, -27, -168.643" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="45, 7, 54" position="-148.344, -27, -139.996" rotation="0, -120, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="45, 4, 54" position="-109.211, -28.5, -129.51" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="45, 4, 54" position="-70.079, -28.5, -139.996" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="45, 4, 54" position="-41.432, -28.5, -168.643" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="230, 7, 116" position="-106.441, -27, -274.574" rotation="0, -120, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="230, 4, 116" position="-55.711, -28.5, -260.981" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#5eadd1" scale="230, 1, 116" position="-4.982, -30, -274.574" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="22, 11, 26" position="-141.718, -18, -179.471" rotation="0, -120, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="26, 7, 26" position="-141.718, -20, -179.471" rotation="0, -165, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="12, 21, 12" position="-89.211, -25.608, -141.986" rotation="0, -90, -15"></a-box>
+			<a-box static-body color="#9397aa" scale="12, 24, 12" position="22.967, -27.415, -194.87" rotation="-15, -60, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="6, 47, 6" position="25.545, -16.307, -196.359" rotation="-12.953, -29.133, -7.631"></a-box>
+			<a-box static-body color="#478d4b" scale="52, 101, 5" position="-191.501, 345, -256.783" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="29, 131, 5" position="-180.001, 330, -256.783" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="28, 188, 5" position="-117.501, 269.5, -256.783" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="27, 126, 5" position="-94.001, 300.5, -256.783" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="51, 84, 5" position="-82.001, 321.5, -256.783" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="70, 73, 5" position="32.06, 281, -233.791" rotation="0, 150, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="28, 116, 5" position="50.247, 223.5, -223.291" rotation="0, 150, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="28, 116, 5" position="84.022, 274.5, -203.791" rotation="0, 150, 0"></a-box>
+			<a-box static-body color="#8e92a5" scale="87, 53, 64" position="37.326, -45.762, 31.841" rotation="0, -45, -15"></a-box>
+			<a-box static-body color="#999db1" scale="90, 58, 86" position="-3, -29.5, 0" rotation="0, 0, 0"></a-box>
+			<a-box static-body color="#9195a8" scale="38, 78, 52" position="-9.893, -16.349, 7.112" rotation="0, 30, -45"></a-box>
+			<a-box static-body color="#999db1" scale="60, 24, 34" position="10.682, -24.5, 36.083" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#999db1" scale="48, 39, 67" position="-60.097, -17, 67.211" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#999db1" scale="60, 24, 34" position="-22.974, -24.5, 61.907" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#8f93a6" scale="75, 27, 108" position="-76.857, -33.166, -10.092" rotation="-15, 45, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="82, 9, 88" position="-67.154, 71, -244.409" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="8, 27, 11" position="-107.163, 62, -238.047" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="8, 42, 16" position="-103.669, 54.5, -251.087" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="20, 30, 4" position="-87.683, 60.5, -206.428" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="11, 64, 4" position="-74.643, 43.5, -202.934" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="11, 16, 28" position="-44.491, 67.5, -207.278" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="4, 20, 28" position="-37.247, 65.5, -205.337" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="4, 21, 10" position="-34.918, 56, -214.03" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="4, 27, 19" position="-23.4, 53, -257.014" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="76, 21, 85" position="-66.765, 62, -245.858" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#8c90a2" scale="58, 29, 68" position="-64.793, 51.282, -253.218" rotation="-15, 165, 0"></a-box>
+			<a-box static-body color="#828696" scale="46, 49, 15" position="-63.501, 35, -251.783" rotation="-0, -180, 0"></a-box>
+			<a-box static-body color="#7a7d8d" scale="18, 31, 8" position="-63.501, 0, -255.283" rotation="-0, -180, 0"></a-box>
+			<a-box static-body color="#478d4b" scale="44, 42, 6" position="48.799, 124.518, -210.783" rotation="-75, -30, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="40, 38, 12" position="49.446, 119.688, -211.904" rotation="-75, -30, 0"></a-box>
+			<a-box static-body color="#808394" scale="26, 29, 21" position="51.696, 109.188, -215.801" rotation="-90, -15, 0"></a-box>
+			<a-box static-body color="#686b79" scale="18, 19, 36" position="55.599, 93.069, -230.368" rotation="-60, -15, 0"></a-box>
+			<a-box static-body color="#999db1" scale="52, 34, 54" position="-26.5, -33.07, -69.935" rotation="-7.435, -60.853, 13.064"></a-box>
+			<a-box static-body color="#8d90a3" scale="28, 72, 32" position="-26.5, -14.718, -74.852" rotation="-14.478, -15.504, 3.967"></a-box>
+			<a-box static-body color="#9397aa" scale="28, 96, 32" position="-26.5, -3.127, -77.958" rotation="-7.435, -60.853, 13.064"></a-box>
+			<a-box static-body color="#8d90a3" scale="14, 96, 14" position="-26.5, 53.863, -93.228" rotation="-12.953, -30.867, 7.631"></a-box>
+			<a-box static-body color="#999db1" scale="52, 34, 54" position="4.35, -16.06, 73.108" rotation="0, -60, -15"></a-box>
+			<a-box static-body color="#8d90a3" scale="28, 72, 32" position="6.808, 2.292, 77.367" rotation="10.545, -15.993, -10.729"></a-box>
+			<a-box static-body color="#9397aa" scale="28, 96, 32" position="8.361, 13.884, 80.056" rotation="0, -60, -15"></a-box>
+			<a-box static-body color="#8d90a3" scale="14, 96, 14" position="15.996, 70.873, 93.281" rotation="7.435, -30.853, -13.064"></a-box>
+			<a-box static-body color="#999db1" scale="52, 34, 54" position="-128.806, -23.063, 45.617" rotation="15, -75, 0"></a-box>
+			<a-box static-body color="#9397aa" scale="28, 96, 32" position="-136.556, 6.881, 47.694" rotation="15, -75, 0"></a-box>
+			<a-box static-body color="#8d90a3" scale="28, 72, 32" position="-133.556, -4.71, 46.89" rotation="10.545, -29.007, 10.729"></a-box>
+			<a-box static-body color="#8d90a3" scale="14, 96, 14" position="-151.306, 63.871, 51.646" rotation="12.953, -44.133, 7.631"></a-box>
+			<a-box static-body color="#999db1" scale="52, 34, 54" position="-255, 549.5, 36" rotation="0, 90, 180"></a-box>
+			<a-box static-body color="#8d90a3" scale="28, 72, 32" position="-255, 530.5, 36" rotation="0, 45, 180"></a-box>
+			<a-box static-body color="#9397aa" scale="28, 96, 32" position="-255, 518.5, 36" rotation="0, 90, 180"></a-box>
+			<a-box static-body color="#8d90a3" scale="14, 96, 14" position="-255, 459.5, 36" rotation="0, 60, 180"></a-box>
+			<a-box static-body color="#999db1" scale="52, 34, 54" position="-90, 441.5, 101" rotation="0, 90, 180"></a-box>
+			<a-box static-body color="#8d90a3" scale="28, 72, 32" position="-90, 422.5, 101" rotation="0, 45, 180"></a-box>
+			<a-box static-body color="#9397aa" scale="28, 96, 32" position="-90, 410.5, 101" rotation="0, 90, 180"></a-box>
+			<a-box static-body color="#8d90a3" scale="14, 96, 14" position="-90, 351.5, 101" rotation="0, 60, 180"></a-box>
+			<a-box static-body color="#999db1" scale="52, 34, 54" position="-42, 455.5, -75" rotation="0, 90, 180"></a-box>
+			<a-box static-body color="#8d90a3" scale="28, 72, 32" position="-42, 436.5, -75" rotation="0, 45, 180"></a-box>
+			<a-box static-body color="#9397aa" scale="28, 96, 32" position="-42, 424.5, -75" rotation="0, 90, 180"></a-box>
+			<a-box static-body color="#8d90a3" scale="14, 96, 14" position="-42, 365.5, -75" rotation="0, 60, 180"></a-box>
+			<a-box static-body color="#999db1" scale="52, 34, 54" position="92, 495.5, -1" rotation="0, 90, 180"></a-box>
+			<a-box static-body color="#9397aa" scale="28, 96, 32" position="92, 464.5, -1" rotation="0, 90, 180"></a-box>
+			<a-box static-body color="#8d90a3" scale="28, 72, 32" position="92, 476.5, -1" rotation="0, 45, 180"></a-box>
+			<a-box static-body color="#8d90a3" scale="14, 96, 14" position="92, 405.5, -1" rotation="0, 60, 180"></a-box>
+			<a-box static-body color="#adaeca" scale="58, 126, 64" position="219.932, 407.5, 31.482" rotation="0, 75, 180"></a-box>
+			<a-box static-body color="#bec7d3" scale="58, 151, 64" position="219.932, 395, 31.482" rotation="0, 30, 180"></a-box>
+			<a-box static-body color="#b4b4b0" scale="34, 199, 36" position="219.932, 348, 31.482" rotation="0, 75, 180"></a-box>
+			<a-box static-body color="#b3b4a3" scale="20, 264, 20" position="219.932, 315.5, 31.482" rotation="0, 60, 180"></a-box>
+			<a-box static-body color="#cfd5b0" scale="36, 22, 36" position="219.932, 175.5, 31.482" rotation="0, 90, 180"></a-box>
+			<a-box static-body color="#f90000" scale="53, 132, 6" position="-137.397, 386, 189.521" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#f90000" scale="28, 85, 6" position="-125.323, 291.5, 186.286" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#f90000" scale="20, 20, 6" position="-159.13, 287, 195.345" rotation="0, 15, 30"></a-box>
+			<a-box static-body color="#f90000" scale="20, 20, 6" position="-133.51, 219.847, 188.48" rotation="0, 15, -15"></a-box>
+			<a-box static-body color="#f90000" scale="30, 429, 6" position="-245.097, 188.5, 218.38" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#f90000" scale="30, 188, 6" position="-77.626, 406.5, 53.342" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#f90000" scale="16, 101, 6" position="-83.688, 262, 49.842" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#f90000" scale="6, 46, 6" position="-79.358, 167.5, 52.342" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#f90000" scale="42, 11, 20" position="-245.097, -20.5, 218.38" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#f90000" scale="62, 10, 52" position="-250.754, -26, 224.037" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#f90000" scale="30, 429, 6" position="-10.026, 188.5, 191.765" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#f90000" scale="42, 11, 20" position="-10.026, -20.5, 191.765" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#f90000" scale="62, 5, 36" position="-10.026, -23.5, 191.765" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#5e3230" scale="30, 32, 29" position="49.224, -26.296, 150.845" rotation="-15, -30, 0"></a-box>
+			<a-box static-body color="#884845" scale="20, 32, 21" position="51.224, 1.704, 147.381" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#be6360" scale="12, 32, 13" position="49.403, 30.752, 150.535" rotation="15, -30, 0"></a-box>
+			<a-box static-body color="#5e3230" scale="30, 32, 29" position="-20.975, -23.782, 137.298" rotation="-31.636, -5.464, 8.743"></a-box>
+			<a-box static-body color="#884845" scale="20, 32, 21" position="-24.112, 1.624, 125.267" rotation="-16.789, -3.109, 7.769"></a-box>
+			<a-box static-body color="#be6360" scale="12, 32, 13" position="-27.77, 30.229, 120.234" rotation="-1.919, -1.103, 7.44"></a-box>
+			<a-box static-body color="#5e3230" scale="30, 32, 29" position="-102.56, -20.124, 150.714" rotation="-15, 45, 0"></a-box>
+			<a-box static-body color="#884845" scale="20, 32, 21" position="-105.388, 7.876, 147.886" rotation="0, 45, 0"></a-box>
+			<a-box static-body color="#be6360" scale="12, 32, 13" position="-102.813, 36.923, 150.461" rotation="15, 45, 0"></a-box>
+			<a-box static-body color="#4b2726" scale="81, 14, 40" position="-62.452, -23.5, 231.855" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#5e3230" scale="90, 20, 53" position="-107, -20.5, 196.5" rotation="0, 0, 0"></a-box>
+			<a-box static-body color="#754842" scale="90, 31, 90" position="-169.5, -15, 181.258" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#7d5454" scale="68, 17, 80" position="-190.5, -22, 144.885" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#fff04f" scale="38, 127, 42" position="241.638, 148.858, 142.719" rotation="-12.507, 123.471, 147.487" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="34, 124, 36" position="242.311, 147.624, 143.24" rotation="-12.507, 123.471, 147.487"></a-box>
+			<a-box static-body color="#fff04f" scale="38, 127, 42" position="258.982, 95.222, 140.014" rotation="7.181, 145.893, 115.893" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="34, 124, 36" position="260.054, 94.572, 140.839" rotation="7.181, 145.893, 115.893"></a-box>
+			<a-box static-body color="#fff04f" scale="38, 127, 42" position="221.277, 190.974, -107.113" rotation="-20.435, 69.667, -121.024" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="34, 124, 36" position="221.977, 190.25, -108.224" rotation="-20.435, 69.667, -121.024"></a-box>
+			<a-box static-body color="#fff04f" scale="38, 127, 42" position="327.687, -39.657, -31.036" rotation="15, 150, 90" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="34, 124, 36" position="328.986, -39.657, -30.286" rotation="15, 150, 90"></a-box>
+			<a-sphere static-body color="#94c7f7" radius="10.5" position="-206.501, -19.5, -249.783" rotation="0, 0, 0" opacity="0.5"></a-sphere>
+			<a-sphere static-body color="#94c7f7" radius="7.5" position="-197.501, -19.5, -249.783" rotation="0, 0, 0" opacity="0.5"></a-sphere>
+			<a-sphere static-body color="#94c7f7" radius="10.5" position="-186.501, -19.5, -251.783" rotation="0, 0, 0" opacity="0.5"></a-sphere>
+			<a-sphere static-body color="#94c7f7" radius="8.5" position="-174.501, -18.5, -251.783" rotation="0, 0, 0" opacity="0.5"></a-sphere>
+			<a-sphere static-body color="#94c7f7" radius="7.5" position="-167.501, -19.5, -252.783" rotation="0, 0, 0" opacity="0.5"></a-sphere>
+			<a-sphere static-body color="#94c7f7" radius="8.5" position="-159.501, -18.5, -249.783" rotation="0, 0, 0" opacity="0.5"></a-sphere>
+			<a-sphere static-body color="#94c7f7" radius="9.5" position="-154.501, -17.5, -255.783" rotation="0, 0, 0" opacity="0.5"></a-sphere>
+			<a-cylinder static-body color="#f90000" radius="100" height="5" position="-146.026, -28.5, 269.265" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#f90000" radius="100" height="5" position="-42.026, -28.5, 230.265" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#f90000" radius="12.5" height="1" position="-98.026, -30.5, 119.265" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#f90000" radius="12.5" height="1" position="12.974, -30.5, 149.265" rotation="0, 0, 0"></a-cylinder>
+			<a-box static-body color="#000000" scale="453, 794, 480" position="249.485, -631.5, 25.01" rotation="0, -165, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#000000" scale="453, 847, 480" position="249.485, -605, 25.01" rotation="0, -165, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#000000" scale="453, 729, 480" position="249.485, -664, 25.01" rotation="0, -165, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#000000" scale="453, 643, 480" position="249.485, -707, 25.01" rotation="0, -165, 0"></a-box>
+			<a-box static-body color="#000000" scale="68, 84, 140" position="-180.501, 187.5, -342.283" rotation="0, 0, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#000000" scale="68, 84, 133" position="-180.501, 187.5, -345.783" rotation="0, 0, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#000000" scale="68, 84, 126" position="-180.501, 187.5, -349.283" rotation="0, 0, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#000000" scale="68, 84, 118" position="-180.501, 187.5, -353.283" rotation="0, 0, 0"></a-box>
+			<a-box static-body color="#ffffff" scale="88, 612, 432" position="-575.834, 275.5, 14.201" rotation="0, -15, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#ffffff" scale="70, 612, 432" position="-584.528, 275.5, 11.872" rotation="0, -15, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#ffffff" scale="53, 612, 432" position="-592.738, 275.5, 9.672" rotation="0, -15, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#ffffff" scale="36, 612, 432" position="-600.948, 275.5, 7.472" rotation="0, -15, 0"></a-box>
+			
+			<!-- Lobby -->
+			<a-box static-body color="#b2b6ce" scale="90, 58, 90" position="-35, -1.5, 21.608" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#b2b6ce" scale="64, 81, 70" position="-65.6, 10, 19.454" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b2b6ce" scale="43, 78, 8" position="-37.636, 8.5, 52.337" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b2b6ce" scale="36, 91, 37" position="-63.497, 15, 41.87" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#b2b6ce" scale="17, 91, 14" position="-52.883, 15, 30.337" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b2b6ce" scale="23, 88, 15" position="-59.22, 13.5, 27.277" rotation="0, 120, 0"></a-box>
+			<a-box static-body color="#b2b6ce" scale="19, 91, 11" position="-60.293, 15, 29.868" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#a7abc2" scale="31, 23, 9" position="-28.037, 24, 53.389" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#ceaabb" scale="36, 6, 37" position="-63.497, 63.5, 41.87" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#ceaabb" scale="19, 6, 11" position="-60.293, 63.5, 29.868" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#ceaabb" scale="17, 4, 14" position="-52.883, 62.5, 30.337" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#c87b87" scale="19, 4, 11" position="-60.293, 68.5, 29.868" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#c87b87" scale="36, 6, 37" position="-63.497, 69.5, 41.87" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#81a57f" scale="22, 1, 11" position="-23.452, 28, -17.391" rotation="0, 120, 0"></a-box>
+			<a-box static-body color="#81a57f" scale="38, 1, 21" position="-33.309, 28, 19.946" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#81a57f" scale="38, 1, 21" position="-33.309, 28, -2.463" rotation="0, 120, 0"></a-box>
+			<a-box static-body color="#81a57f" scale="2, 7, 2" position="-22.129, 29.942, -15.71" rotation="9.488, 153.922, 9.375"></a-box>
+			<a-box static-body color="#81a57f" scale="2, 7, 2" position="-23.686, 27.676, -14.51" rotation="-20.238, 153.069, -6.066"></a-box>
+			<a-box static-body color="#81a57f" scale="2, 7, 2" position="-23.601, 27.81, 4.409" rotation="-17.967, 168.767, -11.233"></a-box>
+			<a-box static-body color="#81a57f" scale="2, 7, 2" position="-21.812, 29.275, 6.321" rotation="-32.931, 167.606, 19.27"></a-box>
+			<a-box static-body color="#81a57f" scale="2, 1, 2" position="-10.068, 28, 8.023" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#81a57f" scale="5, 1, 4" position="-7.707, 28, -5.12" rotation="0, 90, 0"></a-box>
+			<a-box static-body color="#81a57f" scale="5, 4, 2" position="-3.011, 26.5, -8.986" rotation="0, 120, 0"></a-box>
+			<a-box static-body color="#81a57f" scale="4, 4, 4" position="-4.395, 26.5, -13.383" rotation="0, 120, 0"></a-box>
+			<a-box static-body color="#81a57f" scale="12, 3, 4" position="-36.95, 50, 6.601" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#81a57f" scale="3, 6, 4" position="-38.115, 45.5, 2.254" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="2, 3, 2" position="24.422, 29, 37.53" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="2, 3, 2" position="15.922, 29, 22.807" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="2, 3, 2" position="9.7, 29, 46.03" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="2, 3, 2" position="-44.81, 52, -20.798" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="2, 3, 2" position="-61.23, 52, -16.398" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="2, 3, 2" position="-40.41, 52, -4.378" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="2, 3, 2" position="-87.31, 52, -9.41" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="2, 3, 2" position="-103.731, 52, -5.01" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="2, 3, 2" position="-99.331, 52, 11.41" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#ebb388" scale="1, 2, 15" position="20.172, 28.5, 30.169" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#ebb388" scale="1, 2, 15" position="17.061, 28.5, 41.78" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#ebb388" scale="1, 2, 15" position="-42.61, 51.5, -12.588" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#ebb388" scale="1, 2, 15" position="-53.02, 51.5, -18.598" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#ebb388" scale="1, 2, 15" position="-95.521, 51.5, -7.21" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#ebb388" scale="1, 2, 15" position="-101.531, 51.5, 3.2" rotation="0, -165, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="4, 0.5, 4" position="1.945, 27.75, 17.598" rotation="0, 0, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="4, 0.5, 4" position="-10.715, 27.75, 15.67" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="4, 0.5, 4" position="-37.898, 50.75, 22.384" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="4, 0.5, 4" position="-44.902, 50.75, 9.767" rotation="0, 0, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="4, 0.5, 4" position="-63.756, 50.75, -0.71" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#9a5757" scale="4, 0.5, 4" position="-66.126, 72.75, 33.424" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#9a5757" scale="4, 0.5, 4" position="-58.367, 72.75, 45.986" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="3, 0.5, 3" position="-5.068, 27.75, 16.451" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="3, 0.5, 3" position="-43.573, 50.75, 16.658" rotation="0, -75, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="3, 0.5, 3" position="-53.346, 50.75, 5.3" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="3, 0.5, 3" position="-69.785, 50.75, -5.824" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="3, 0.5, 3" position="-69.053, 50.75, -12.75" rotation="0, 0, 0"></a-box>
+			<a-box static-body color="#9a5757" scale="3, 0.5, 3" position="-64.613, 72.75, 41.803" rotation="0, -75, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="2, 0.5, 2" position="-7.385, 27.75, 11.438" rotation="0, 45, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="2, 0.5, 2" position="-35.12, 50.75, 28.887" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="2, 0.5, 2" position="-51.559, 50.75, 17.763" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="2, 0.5, 2" position="-60.013, 50.75, 5.534" rotation="0, -45, 0"></a-box>
+			<a-box static-body color="#9a9a9a" scale="2, 0.5, 2" position="-64.602, 50.75, -7.73" rotation="0, -75, 0"></a-box>
+			<a-box static-body color="#9a5757" scale="2, 0.5, 2" position="-61.26, 72.75, 26.996" rotation="0, -90, 0"></a-box>
+			<a-box static-body color="#9a5757" scale="2, 0.5, 2" position="-60.93, 72.75, 36.424" rotation="0, -120, 0"></a-box>
+			<a-box static-body color="#ffffff" scale="6, 1, 6" position="7.347, 28, 32.954" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#cbcbcb" scale="7, 0.5, 7" position="7.347, 27.75, 32.954" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#cbcbcb" scale="1.5, 0.5, 1.5" position="13.164, 27.75, 29.596" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#cbcbcb" scale="1.5, 0.5, 1.5" position="3.988, 27.75, 27.137" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#cbcbcb" scale="1.5, 0.5, 1.5" position="1.529, 27.75, 36.313" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#cbcbcb" scale="1.5, 0.5, 1.5" position="10.706, 27.75, 38.772" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#a1a1a1" scale="1.5, 0.5, 1.5" position="13.835, 27.75, 34.693" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#a1a1a1" scale="1.5, 0.5, 1.5" position="9.085, 27.75, 26.466" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#a1a1a1" scale="1.5, 0.5, 1.5" position="0.858, 27.75, 31.216" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#a1a1a1" scale="1.5, 0.5, 1.5" position="5.608, 27.75, 39.443" rotation="0, -60, 0"></a-box>
+			<a-box static-body color="#5e3230" scale="10, 9, 10" position="-44.736, 62.853, 51.547" rotation="0, 150, 75"></a-box>
+			<a-box static-body color="#5e3230" scale="10, 18, 10" position="-59.628, 64.32, 63.136" rotation="0.993, 116.787, 70.663"></a-box>
+			<a-box static-body color="#884845" scale="7, 9, 6" position="-40.756, 65.328, 53.845" rotation="0, 150, 45"></a-box>
+			<a-box static-body color="#884845" scale="7, 9, 6" position="-55.666, 68.625, 70.817" rotation="0.993, 116.787, 40.663"></a-box>
+			<a-box static-body color="#be6360" scale="3, 9, 4" position="-53.594, 75.402, 74.662" rotation="0.993, 116.787, 25.663"></a-box>
+			<a-box static-body color="#be6360" scale="3, 9, 4" position="-36.542, 71.756, 56.278" rotation="0, 150, 30"></a-box>
+			<a-box static-body color="#f90000" scale="6, 1, 6" position="-51.635, 73, 38.326" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#f90000" scale="7, 1, 6" position="-48.703, 73, 39.611" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#f90000" scale="6, 25, 6" position="-80.152, 61, 35.718" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#f90000" scale="10, 6, 8" position="-81.018, 51.5, 35.218" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#f90000" scale="14, 4, 10" position="-81.884, 50.5, 34.718" rotation="0, 60, 0"></a-box>
+			<a-box static-body color="#f90000" scale="6, 25, 6" position="-78.492, 62, 52.842" rotation="0, -30, 0"></a-box>
+			<a-box static-body color="#f90000" scale="10, 5, 5" position="-79.139, 52, 55.257" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#f90000" scale="7, 16, 5" position="-79.629, 44.5, 57.895" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#f90000" scale="4, 10, 5" position="-81.078, 31.5, 58.283" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="7, 1, 3" position="-31.18, 30, 10.749" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="7, 1, 3" position="-30.145, 32, 14.613" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="7, 1, 3" position="-29.11, 34, 18.476" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="7, 1, 3" position="-28.074, 36, 22.34" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="7, 1, 3" position="-27.039, 38, 26.204" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="7, 1, 3" position="-26.004, 40, 30.068" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="7, 1, 3" position="-24.969, 42, 33.931" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="7, 1, 3" position="-23.933, 44, 37.795" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#cb9c76" scale="7, 1, 3" position="-22.898, 46, 41.659" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b98d6b" scale="1, 4, 1" position="-29.248, 29.5, 10.231" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b98d6b" scale="1, 6, 1" position="-28.213, 30.5, 14.095" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b98d6b" scale="1, 8, 1" position="-27.178, 31.5, 17.959" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b98d6b" scale="1, 10, 1" position="-26.143, 32.5, 21.823" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b98d6b" scale="1, 12, 1" position="-25.107, 33.5, 25.686" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b98d6b" scale="1, 14, 1" position="-24.072, 34.5, 29.55" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b98d6b" scale="1, 16, 1" position="-23.037, 35.5, 33.414" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b98d6b" scale="1, 18, 1" position="-22.001, 36.5, 37.277" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#b98d6b" scale="1, 20, 1" position="-20.966, 37.5, 41.141" rotation="0, 15, 0"></a-box>
+			<a-box static-body color="#fff04f" scale="8, 22, 18" position="-76.988, 45.5, -23.047" rotation="0, 15, -90" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="9, 22, 6" position="-75.435, 37, -17.251" rotation="0, 15, -90" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="6, 5, 5" position="-51.363, 55.5, -6.619" rotation="0, 60, -105" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="6, 5, 5" position="-82.342, 55.5, -2.459" rotation="-15, 60, -90" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="6, 5, 5" position="-85.79, 55.5, 23.311" rotation="-15, 120, -90" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="5, 7, 7" position="-84.781, 51.153, 22.729" rotation="-15, 120, -90" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="5, 7, 7" position="-81.333, 51.153, -1.877" rotation="-15, 60, -90" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="5, 7, 7" position="-51.945, 51.153, -5.61" rotation="0, 60, -105" opacity="0.5"></a-box>
+			<a-box static-body color="#fff04f" scale="9, 3, 3" position="-85.229, 53.085, 22.988" rotation="-15, 120, -90"></a-box>
+			<a-box static-body color="#fff04f" scale="9, 3, 3" position="-81.782, 53.085, -2.136" rotation="-15, 60, -90"></a-box>
+			<a-box static-body color="#fff04f" scale="9, 3, 3" position="-51.687, 53.085, -6.059" rotation="0, 60, -105"></a-box>
+			<a-box static-body color="#fff04f" scale="4, 5, 5" position="-84.669, 50.67, 22.664" rotation="-15, 120, -90"></a-box>
+			<a-box static-body color="#fff04f" scale="4, 5, 5" position="-81.221, 50.67, -1.812" rotation="-15, 60, -90"></a-box>
+			<a-box static-body color="#fff04f" scale="4, 5, 5" position="-52.01, 50.67, -5.498" rotation="0, 60, -105"></a-box>
+			<a-box static-body color="#fff04f" scale="15, 20, 5" position="-75.306, 41, -16.768" rotation="0, 15, -90"></a-box>
+			<a-box static-body color="#fff04f" scale="6, 20, 12" position="-77.506, 45.5, -24.978" rotation="0, 15, -90"></a-box>
+			<a-box static-body color="#9092a5" scale="1, 2, 0.5" position="-3.47, 28.5, 41.22" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#9092a5" scale="1, 2, 0.5" position="-6.72, 28.5, 35.591" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#a9adc3" scale="1, 10, 3" position="-5.095, 32.5, 38.405" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#797b8b" scale="1, 4, 0.5" position="-3.72, 29.5, 40.787" rotation="0, -150, 0"></a-box>
+			<a-box static-body color="#797b8b" scale="1, 4, 0.5" position="-6.47, 29.5, 36.024" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#6a6c7a" scale="1, 7, 0.5" position="-6.22, 31, 36.457" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#6a6c7a" scale="1, 7, 0.5" position="-3.97, 31, 40.354" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#5b5d69" scale="1, 10, 0.5" position="-4.22, 32.5, 39.921" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#5b5d69" scale="1, 10, 0.5" position="-5.97, 32.5, 36.89" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#90ff8a" scale="1, 3, 3" position="-4.662, 29, 38.155" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#fff260" scale="1, 3, 3" position="-4.662, 32, 38.155" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#ffa850" scale="1, 3, 3" position="-4.662, 35, 38.155" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#ff5858" scale="1, 1.5, 3" position="-4.662, 37.25, 38.155" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#ff0000" scale="0.25, 0.25, 2" position="-5.695, 35, 35.865" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#ff0000" scale="0.25, 0.25, 2" position="-5.695, 30, 35.865" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#ff0000" scale="0.25, 0.25, 2" position="-3.195, 31.5, 40.195" rotation="0, 30, 0"></a-box>
+			
+			<a-box static-body color="#67e7e7" scale="2, 7, 1" position="-40.419, 32, -12.14" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="2, 7, 1" position="-38.349, 32, -4.412" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="8, 1, 1" position="-39.384, 36, -8.276" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 1, 1" position="-40.031, 35, -10.691" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 1, 1" position="-40.031, 29, -10.691" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 1, 1" position="-38.737, 35, -5.861" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 1, 1" position="-38.737, 29, -5.861" rotation="0, 105, 0"></a-box>
+			<a-box static-body color="#1b2a35" scale="10, 3, 1" position="-39.384, 38, -8.276" rotation="0, 105, 0"></a-box>
+			
+			<a-text value="Reference: initial camera direction" position="-39.384, 38, -8.276" color="white" rotation="0, 0, 0" ></a-text>
+			
+			<a-box static-body color="#90ff8a" scale="6, 7, 0.5" position="-39.384, 32, -8.276" rotation="0, 105, 0" id="toas"></a-box>
+			<a-cylinder static-body color="#67e7e7" radius="1" position="-40.678, 29.5, -13.106" rotation="0, 15, 90"></a-cylinder>
+			<a-cylinder static-body color="#67e7e7" radius="1" position="-40.419, 35.5, -12.14" rotation="0, 15, 90"></a-cylinder>
+			<a-cylinder static-body color="#67e7e7" radius="1" position="-38.349, 35.5, -4.412" rotation="0, 15, 90"></a-cylinder>
+			<a-cylinder static-body color="#67e7e7" radius="1" position="-38.09, 29.5, -3.446" rotation="0, 15, 90"></a-cylinder>
+			
+			<a-entity position="-6.945, 35, 33.7" text="value: hufidesifgifgidfgis"></a-entity>
+			
+			<!-- Tower 1 -->
+			<a-box static-body color="#67e7e7" scale="1, 50, 50" position="-67.269, 101.5, -201.476" rotation="0, 75, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#67e7e7" scale="50, 1, 50" position="-60.669, 76, -226.107" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 50, 50" position="-85.301, 101.5, -232.707" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 50, 50" position="-54.07, 101.5, -250.738" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 50, 38" position="-34.485, 101.5, -225.302" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="5, 5, 5" position="-88.226, 79, -210.197" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="5, 10, 5" position="-86.932, 81.5, -215.027" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="5, 15, 5" position="-85.638, 84, -219.856" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="5, 20, 35" position="-80.462, 86.5, -239.175" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="3, 25, 10" position="-83.369, 109, -232.189" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="5, 25, 20" position="-78.521, 109, -246.419" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="2, 20, 22" position="-75.399, 86.5, -244.547" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 20, 1" position="-64.773, 85.5, -241.7" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="4, 50, 4" position="-60.67, 101.5, -226.107" rotation="0, 120, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 20, 1" position="-47.387, 85.5, -237.042" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="17, 1, 17" position="-53.832, 77, -207.193" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="15, 3, 15" position="-53.125, 78, -205.968" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="2, 34, 2" position="-61.256, 93.5, -220.052" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="5, 20, 50" position="-38.936, 86.5, -220.283" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="5, 5, 30" position="-41.524, 99, -210.624" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="5, 5, 25" position="-42.171, 104, -208.209" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="5, 5, 20" position="-42.818, 109, -205.794" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="20, 1, 20" position="-54.893, 111, -209.03" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 35, 12" position="-40.956, 94, -201.154" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="2, 5, 7" position="-61.574, 114, -206.541" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="4, 3, 2" position="-59.574, 113, -203.041" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="2, 2, 7" position="-59.574, 112.5, -206.541" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="4, 3, 2" position="-59.574, 113, -210.041" rotation="0, 180, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="4, 3, 2" position="-54.585, 113, -213.964" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="4, 3, 2" position="-47.823, 113, -212.152" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="2, 2, 7" position="-51.204, 112.5, -213.058" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="2, 5, 7" position="-50.686, 114, -214.99" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 2, 2" position="-39.662, 125.5, -205.984" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 2, 2" position="-42.25, 125.5, -196.325" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 2, 2" position="-39.662, 112.5, -205.984" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 2, 2" position="-42.25, 112.5, -196.325" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="10, 1, 8" position="-35.643, 111, -199.731" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="8, 1, 50" position="-21.515, 111, -217.686" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 37, 1" position="-17.847, 92, -241.032" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 37, 1" position="-30.012, 92, -195.634" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="10, 1, 1" position="-22.194, 73, -242.197" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="10, 1, 1" position="-34.359, 73, -196.798" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="4, 15, 1" position="-26.631, 119, -194.728" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 15, 3" position="-24.665, 119, -196.271" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="2, 15, 26" position="-21.515, 119, -217.686" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="4, 15, 18" position="-21.515, 119, -217.686" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="6, 15, 10" position="-21.515, 119, -217.686" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="4, 15, 1" position="-16.398, 119, -240.644" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 15, 3" position="-18.365, 119, -239.1" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="10, 1, 8" position="-7.386, 111, -235.641" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="3, 1, 8" position="-1.282, 111.371, -234.005" rotation="0, 165, -15"></a-box>
+			<a-box static-body color="#67e7e7" scale="3, 1, 8" position="1.256, 112.459, -233.325" rotation="0, 165, -30"></a-box>
+			<a-box static-body color="#67e7e7" scale="3, 1, 8" position="3.435, 114.191, -232.741" rotation="-0, 165, -45"></a-box>
+			<a-box static-body color="#67e7e7" scale="3, 1, 8" position="5.107, 116.447, -232.293" rotation="-0, 165, -60"></a-box>
+			<a-box static-body color="#67e7e7" scale="3, 1, 8" position="6.158, 119.074, -232.012" rotation="-0, 165, -75"></a-box>
+			<a-box static-body color="#67e7e7" scale="3, 1, 8" position="6.517, 121.894, -231.916" rotation="0, 165, -90"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 6, 8" position="9.898, 122.894, -231.01" rotation="0, 165, -90"></a-box>
+			<a-box static-body color="#67e7e7" scale="1, 2, 6" position="13.761, 122.894, -229.974" rotation="0, 165, -90"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 50, 50" position="-67.269, 151.5, -201.476" rotation="0, 75, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 50, 50" position="-85.301, 151.5, -232.707" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 50, 50" position="-54.07, 151.5, -250.738" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 50, 38" position="-34.485, 151.5, -225.302" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 10, 12" position="-40.956, 171.5, -201.154" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 2, 2" position="-42.25, 165.5, -196.325" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 2, 2" position="-39.662, 165.5, -205.984" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 2, 2" position="-42.25, 152.5, -196.325" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 2, 2" position="-39.662, 152.5, -205.984" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 25, 12" position="-40.956, 139, -201.154" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 2, 6" position="9.898, 130.894, -231.01" rotation="0, 165, -90"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 2, 8" position="7.966, 130.894, -231.527" rotation="0, 165, -90"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 8" position="6.517, 131.894, -231.916" rotation="0, 165, -90"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 8" position="6.158, 134.713, -232.012" rotation="0, 165, -105"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 8" position="5.107, 137.34, -232.293" rotation="0, 165, -120"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 8" position="3.435, 139.597, -232.741" rotation="0, 165, -135"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 8" position="1.256, 141.328, -233.325" rotation="-0, 165, -150"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 8" position="-1.282, 142.416, -234.005" rotation="-0, 165, -165"></a-box>
+			<a-box static-body color="#68d7f9" scale="18, 1, 8" position="-11.25, 142.787, -236.676" rotation="0, 165, 180"></a-box>
+			<a-box static-body color="#68d7f9" scale="4, 16, 1" position="-16.398, 134.5, -240.644" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 16, 3" position="-18.365, 134.5, -239.1" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="2, 3, 26" position="-21.515, 128, -217.686" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="4, 4, 18" position="-21.515, 128.5, -217.686" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="6, 16, 10" position="-21.515, 134.5, -217.686" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="4, 1, 26" position="-21.515, 142, -217.686" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 20, 3" position="-24.665, 136.5, -196.271" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="4, 20, 1" position="-26.631, 136.5, -194.728" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="6, 1, 6" position="-26.243, 147, -196.177" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 1, 6" position="-37.092, 151, -200.119" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 8" position="-39.024, 151, -200.637" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="50, 1, 5" position="-66.493, 151, -204.374" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 40" position="-38.936, 151, -220.283" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="50, 1, 5" position="-54.846, 151, -247.84" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 40" position="-82.403, 151, -231.93" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 3" position="-47.588, 151, -203.449" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 3" position="-38.012, 151, -239.188" rotation="0, -105, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 3" position="-83.327, 151, -213.025" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="3, 1, 3" position="-73.751, 151, -248.765" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="2, 1, 2" position="-50.132, 151, -203.613" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="2, 1, 2" position="-46.458, 151, -205.734" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="2, 1, 2" position="-40.297, 151, -240.318" rotation="0, -105, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="2, 1, 2" position="-74.881, 151, -246.479" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="2, 1, 2" position="-71.207, 151, -248.601" rotation="0, -15, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="2, 1, 2" position="-81.042, 151, -211.895" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="2, 1, 2" position="-83.163, 151, -215.57" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="2, 25, 2" position="-60.67, 139, -226.107" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 13, 1" position="-60.67, 158, -226.107" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-60.67, 165, -226.107" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-64.552, 151, -211.618" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-53.17, 151, -213.116" rotation="0, 120, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-46.181, 151, -222.225" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-47.679, 151, -233.607" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-73.66, 151, -218.607" rotation="0, 30, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-75.158, 151, -229.989" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-68.17, 151, -239.097" rotation="0, 120, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-56.787, 151, -240.596" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-52.942, 158, -224.036" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-62.74, 158, -218.379" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="5, 1, 5" position="-68.397, 158, -228.177" rotation="0, 165, 0"></a-box>	
+			<a-box static-body color="#68d7f9" scale="4, 1, 8" position="-19.185, 142, -226.379" rotation="0, 165, 0"></a-box>	
+			<a-box static-body color="#68d7f9" scale="1, 1, 22" position="-64.164, 168, -213.067" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 1, 14" position="-65.199, 172, -209.203" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#68d7f9" scale="1, 1, 9" position="-65.846, 176, -206.788" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 50, 50" position="-67.269, 201.5, -201.476" rotation="0, 75, 0" opacity="0.5"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 50, 50" position="-85.301, 201.5, -232.707" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 50, 50" position="-54.07, 201.5, -250.738" rotation="0, 75, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 14, 50" position="-36.038, 183.5, -219.507" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 7, 24" position="-39.403, 194, -206.95" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 7, 21" position="-32.285, 194, -233.513" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 29, 50" position="-36.038, 212, -219.507" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="50, 1, 50" position="-60.669, 227, -226.107" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 1, 5" position="-66.364, 180, -204.856" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="4, 1, 5" position="-72.642, 180, -206.539" rotation="0, 165, 15"></a-box>
+			<a-box static-body color="#61bcf9" scale="4, 1, 5" position="-80.369, 180, -208.609" rotation="0, 165, -15"></a-box>
+			<a-box static-body color="#61bcf9" scale="4, 1, 19" position="-85.932, 184.464, -220.693" rotation="-30, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="9, 1, 5" position="-80.083, 190, -232.861" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="9, 1, 5" position="-66.56, 190, -229.238" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="9, 1, 5" position="-54.003, 190, -225.873" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="9, 1, 5" position="-40.48, 190, -222.25" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 1, 1" position="-36.168, 197, -219.024" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 1, 1" position="-35.133, 197, -222.888" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 1, 19" position="-37.152, 190, -203.759" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 1, 15" position="-27.923, 193, -218.885" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="7, 1, 1" position="-29.975, 193, -226.682" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 2, 1" position="-26.111, 191.5, -225.647" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="1, 2, 1" position="-29.734, 191.5, -212.124" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="15, 1, 10" position="-33.487, 207, -198.118" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 1, 28" position="-33.399, 207, -217.765" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 2, 26" position="-33.141, 208.5, -218.73" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 2, 24" position="-32.882, 210.5, -219.696" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 2, 22" position="-32.623, 212.5, -220.662" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 2, 20" position="-32.364, 214.5, -221.628" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 2, 18" position="-32.105, 216.5, -222.594" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 2, 16" position="-31.846, 218.5, -223.56" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 2, 14" position="-31.588, 220.5, -224.526" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 2, 12" position="-31.329, 222.5, -225.492" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="5, 2, 10" position="-31.07, 224.5, -226.458" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#67e7e7" scale="21, 1, 3" position="-56.08, 96, -239.371" rotation="0, 165, 0"></a-box>
+			<a-box static-body color="#61bcf9" scale="8, 1, 15" position="-31.303, 190, -219.791" rotation="0, 165, 0"></a-box>
+			<a-cylinder static-body color="#61bcf9" radius="5" height="1" position="-35.902, 190, -198.765" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#61bcf9" radius="10" height="1" position="-17.55, 190, -193.847" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#61bcf9" radius="1" height="13" position="-17.55, 197, -193.847" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#61bcf9" radius="7" height="1" position="-17.55, 195, -193.847" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#61bcf9" radius="4" height="1" position="-17.55, 199, -193.847" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#61bcf9" radius="5" height="1" position="-26.243, 207, -196.177" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#61bcf9" radius="25" height="4" position="-60.669, 229.5, -226.107" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#53a1d5" radius="20" height="4" position="-60.669, 233.5, -226.107" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#53a1d5" radius="3" height="3" position="-44.248, 237, -221.707" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#53a1d5" radius="3" height="8" position="-45.947, 239.5, -234.607" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#53a1d5" radius="3" height="10" position="-56.269, 240.5, -242.527" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#53a1d5" radius="3" height="10" position="-69.169, 240.5, -240.829" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#53a1d5" radius="3" height="10" position="-77.09, 240.5, -230.507" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#53a1d5" radius="3" height="10" position="-65.069, 240.5, -209.686" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#478bb8" radius="10" height="10" position="-60.669, 240.5, -226.107" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#4070b8" radius="5" height="10" position="-60.669, 250.5, -226.107" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#4070b8" radius="3" height="3" position="-56.269, 247, -242.527" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#4070b8" radius="3" height="8" position="-69.169, 249.5, -240.829" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#4070b8" radius="3" height="9" position="-77.09, 250, -230.507" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#4070b8" radius="3" height="9" position="-75.392, 250, -217.607" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#4070b8" radius="3" height="9" position="-65.069, 250, -209.686" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#6b78ee" radius="3" height="4" position="-77.09, 256.5, -230.507" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#6b78ee" radius="3" height="9" position="-75.392, 259, -217.607" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#6b78ee" radius="3" height="14" position="-65.069, 261.5, -209.686" rotation="0, 0, 0"></a-cylinder>
+			<a-cylinder static-body color="#53a1d5" radius="3" height="10" position="-75.392, 240.5, -217.607" rotation="0, 0, 0"></a-cylinder>
+			<a-sphere static-body color="#6b78ee" radius="15" position="-60.669, 268.5, -226.107" rotation="0, 0, 0"></a-sphere>
+			<a-sphere static-body color="#00ff00" scale="5, 5, 5" position="-60.669, 281.5, -226.107" rotation="0, 0, 0" class="goal"></a-sphere>
+	  </a-entity>
+    </a-scene>
+  </body>
+</html>
